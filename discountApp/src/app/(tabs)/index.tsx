@@ -9,6 +9,9 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { useGlobalStyles } from "@/styles/useGlobalStyles";
 
 import { useGetCards } from "@/hooks/useGetCards";
+import { ThemedView } from "@/components/themed-view";
+
+import { Toast } from 'toastify-react-native';
 
 export default function CardsPage(){
   const globalStyles = useGlobalStyles();
@@ -20,27 +23,30 @@ export default function CardsPage(){
   //   alert(JSON.stringify(await cardDatabase.getAllCards()));
   // })();}, []);
 
-  
   return (
-    <SafeAreaView style={[globalStyles.screen]}>
-      <ScrollView>
-        <View style={styles.cardsContainer}>
-          {
-            cards?.map(card => {
-              return (
-                <View key={card.id} style={styles.card}>
-                  <ThemedText>{card.name}</ThemedText>
-                </View>)
-            })
-          }
-        </View>
-      </ScrollView>
+    <ThemedView style={[globalStyles.screen]}>
+      <SafeAreaView style={{flex:1}}>
+        <ScrollView>
+          <View style={styles.cardsContainer}>
+            {
+              cards?.map(card => {
+                return (
+                  <View key={card.id} style={styles.card}>
+                    <TouchableOpacity onPress={() => Toast.success("asd")}>
+                      <ThemedText>{card.name}</ThemedText>
+                    </TouchableOpacity>
+                  </View>)
+              })
+            }
+          </View>
+        </ScrollView>
 
-      <TouchableOpacity onPress={() => router.navigate("/card")} style={styles.addCardButton}>
-        <AntDesign name="plus-circle" size={35} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.navigate("/card")} style={styles.addCardButton}>
+          <AntDesign name="plus-circle" size={35} color="white" />
+        </TouchableOpacity>
 
-    </SafeAreaView>
+      </SafeAreaView>
+    </ThemedView>
   );
 }
 

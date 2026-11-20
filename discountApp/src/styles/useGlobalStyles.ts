@@ -10,17 +10,22 @@ export function useGlobalStyles(){
 
     return StyleSheet.create({
         screen:{
-            paddingHorizontal:5,
+            paddingHorizontal:10,
             flex:1,
             width:"100%",
             height:"100%",
         },
         textInput:{
-            borderColor:"gray",
+            borderColor:Colors.dark.border,
             borderBottomWidth:1,
             color: textColor,
-            // padding:0,
             paddingBottom:2
+        },
+        safeArea:{
+            flex:1
+        },
+        toastSuccess:{
+            backgroundColor:"rgba(42, 168, 94, 0.51)"
         }
     });
 }

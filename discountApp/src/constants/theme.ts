@@ -7,6 +7,8 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+import { DarkTheme, Theme } from 'expo-router';
+
 export const Colors = {
   light: {
     text: '#000000',
@@ -16,12 +18,18 @@ export const Colors = {
     textSecondary: '#60646C',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
+    text: '#F3E9EC',
+    background: '#0B0E1A',
+    backgroundElement: '#2C1B2F',
     backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-  },
+    textSecondary: '#DEABE0',
+    border:"#4D1250"
+    // text: '#ffffff',
+    // background: '#000000',
+    // backgroundElement: '#212225',
+    // backgroundSelected: '#2E3135',
+    // textSecondary: '#B0B4BA',
+  }
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;

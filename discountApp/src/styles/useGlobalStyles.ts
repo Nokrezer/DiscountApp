@@ -30,9 +30,18 @@ export function useGlobalStyles(){
     });
 }
 
+export function useGetTextColor(){
+    const scheme = useColorScheme();
+    const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+    const textColor = colors.text;
+
+    return textColor;
+}
+
 export const generalScales = {
     sm: 4,
     md: 8,
     lg: 16,
     full: "100%"
 }
+

@@ -33,7 +33,7 @@ class CardDatabase{
         return card;
     }
 
-    async addCard(name : string|null, code_data:string, code_type:string, color:string|null){
+    async addCard(name : string|null, code_data:string, code_type:string, color?:string|null){
         const db = await this.connect();
         await db.runAsync(`INSERT INTO cards (name, code_data, code_type, color) VALUES (?, ?, ?, ?)`,
                                 [name ?? null, code_data, code_type, color ?? null]);

@@ -28,7 +28,7 @@ export default function Scanner(){
 
     return (
         <SafeAreaView style={styles.screen}>
-            <CameraView style={styles.screen} facing={"back"} enableTorch={flashState} onBarcodeScanned={(data) => alert(JSON.stringify(data))}>
+            <CameraView style={styles.screen} facing={"back"} enableTorch={flashState} onBarcodeScanned={(data) => backPage(data)}>
             
                 <View style={styles.buttonBar}> 
                     <TouchableOpacity style={[styles.flashButton, styles.buttons]} onPress={() => setFlashState(!flashState)}>

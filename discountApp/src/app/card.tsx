@@ -1,32 +1,43 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from "@/components/themed-view";
-import { router, useLocalSearchParams } from 'expo-router';
+import { DarkTheme, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TextInput, TouchableOpacity, View, KeyboardAvoidingView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { generalScales, useGetTextColor, useGlobalStyles } from "@/styles/useGlobalStyles";
 
 import AntDesign from '@expo/vector-icons/AntDesign';
 
+import { saveCard } from '@/services/saveCard';
+import { Toast } from 'toastify-react-native';
 
 export default function Card(){
-    const {codeData} = useLocalSearchParams();
-    
+    const {codeData:data} = useLocalSearchParams();
+
     const [name, setName] = useState<string>();//Имя карты
     const [codeType, setCodeType] = useState<string | null>(null);//тип штрих кода(если сканируется через камеру)
-    const [cardCode, setCardCode] = useState<string>();//код штриха/qr
+    const [codeData, setcodeData] = useState<string>();//код штриха/qr
 
     const globalStyles = useGlobalStyles();
     const textColor = useGetTextColor();
 
     useEffect(() => {
-        if(!codeData)
+        if(!data)
             return;
 
-        const codeDataDict = typeof codeData === "string" ? JSON.parse(codeData) : codeData;
-        setCardCode(codeDataDict.raw);
-    }, [codeData]);
+        const codeDataDict = typeof data === "string" ? JSON.parse(data) : codeData;
+        setcodeData(codeDataDict.raw);
+        setCodeType(codeDataDict.type);
+    }, [data]);
+
+    const saveCardCallback = async () => {
+        const response = await saveCard({name, codeData, codeType});
+        if(response)
+            Toast.error("Ошибка добавления карты");
+        else
+            Toast.success("Карта добавлена");
+    };
     
     return(
     <ThemedView style={globalStyles.screen}>
@@ -37,22 +48,22 @@ export default function Card(){
 
             <View style={styles.card}>
                 <TextInput placeholderTextColor="lightgray" placeholder="Название" onChangeText={setName} style={globalStyles.textInput}/>
-                <View style={styles.cardCodeView}>
+                <View style={styles.codeDataView}>
                     <TextInput placeholderTextColor="lightgray" keyboardType="number-pad"
-                                placeholder="Код карты" style={[globalStyles.textInput, styles.cardCodeInput]}
-                                value={cardCode} onChangeText={setCardCode}/>
+                                placeholder="Код карты" style={[globalStyles.textInput, styles.codeDataInput]}
+                                value={codeData} onChangeText={setcodeData}/>
                     <TouchableOpacity>
-                        <AntDesign style={styles.cardCodeIcon} name="camera" size={24} color={textColor} onPress={() => router.push("/scanner")}/>
+                        <AntDesign style={styles.codeDataIcon} name="camera" size={24} color={textColor} onPress={() => router.push("/scanner")}/>
                     </TouchableOpacity>
                     {/* <TouchableOpacity>
-                        <FontAwesome5 style={styles.cardCodeIcon} name="file-import" size={24} color={textColor}/>
+                        <FontAwesome5 style={styles.codeDataIcon} name="file-import" size={24} color={textColor}/>
                     </TouchableOpacity> */}
                 </View>
                 {/* <TouchableOpacity style={globalStyles.textInput}>
                     <ThemedText>Цвет карты</ThemedText>
                 </TouchableOpacity> */}
             </View>
-            <TouchableOpacity style={styles.addButtonCard}>
+            <TouchableOpacity style={[styles.addButtonCard, (!name || !codeData) ? styles.disabledAddButtonCard : null]} onPress={saveCardCallback} disabled={(!name || !codeData)}>
                 <ThemedText style={styles.addButtonText}>Добавить</ThemedText>
             </TouchableOpacity>
         </SafeAreaView>
@@ -60,14 +71,14 @@ export default function Card(){
 }
 
 const styles = StyleSheet.create({
-    cardCodeView:{
+    codeDataView:{
         flexDirection:"row",
         width:"100%"
     },
-    cardCodeInput:{
+    codeDataInput:{
         flex:1
     },
-    cardCodeIcon:{
+    codeDataIcon:{
         marginVertical:"auto",
         marginLeft:10
     },
@@ -84,7 +95,8 @@ const styles = StyleSheet.create({
         borderWidth: 0.1,
         padding:20,
         gap:20,
-        marginVertical:15,
+        marginBottom:10,
+        marginTop:5,
         height:200
     },
     addButtonCard:{
@@ -94,6 +106,9 @@ const styles = StyleSheet.create({
         marginHorizontal:"auto",
         height:40,
         borderRadius:generalScales.sm,
+    },
+    disabledAddButtonCard:{
+        backgroundColor: '#2e31356e'
     },
     addButtonText:{
         textAlign:"center",

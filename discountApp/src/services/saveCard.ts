@@ -1,12 +1,17 @@
 import { cardDatabase } from "@/database/database";
 
-export async function saveCard({name, code_data, code_type}:{name:string, code_data:string, code_type:string}){
-    if(code_type === null){//Если тип кода не задан(если пользователь вводил данные вручную)
-        if(code_data.length === 13)
-            code_type = "ean13";
-        else
-            code_type = "code128";
-    }
+export async function saveCard({name, codeData, codeType}:{name?:string, codeData?:string, codeType?:string | null}){
+    try{
+        if(codeType === null){//Если тип кода не задан(если пользователь вводил данные вручную)
+            if(codeData?.length === 13)
+                codeType = "ean13";
+            else
+                codeType = "code128";
+        }
 
-    await cardDatabase.addCard(name, code_data, code_type);
+        if(name && codeData && codeType)
+            await cardDatabase.addCard(name, codeData, codeType);
+    }catch(error){
+        return error;
+    }
 }

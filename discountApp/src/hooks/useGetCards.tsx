@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { cardDatabase } from "@/database/database";
 
-type cardsKeys = "id" | "name" | "code_type" | "code_data" | "color" | "created_at";
+type cardsKeys = "id" | "name" | "color";
 
 export function useGetCards(){
     const [cards, setCards] = useState<Array<Record<cardsKeys, any>>>();

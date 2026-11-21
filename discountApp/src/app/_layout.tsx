@@ -1,5 +1,5 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
-import { useColorScheme, View, Text } from 'react-native';
+import { useColorScheme } from 'react-native';
 
 import { Colors } from "@/constants/theme";
 
@@ -13,8 +13,9 @@ export default function Root(){
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{headerShown:false, headerStyle:headerStyles.header, headerTitleStyle:headerStyles.header, headerTintColor:headerStyles.headerArrow}}>
         <Stack.Screen name="(tabs)"/>
-        <Stack.Screen name="card" options={{headerShown:true, title:"Новая карта"}}/>
-        <Stack.Screen name="scanner" options={{headerShown:true, title:"", headerTransparent:true, headerShadowVisible: false, headerStyle:headerStyles.scannerHeader }}/>
+        <Stack.Screen name="NewCard" options={{headerShown:true, title:"Новая карта"}}/>
+        <Stack.Screen name="Scanner" options={{headerShown:true, title:"", headerTransparent:true, headerShadowVisible: false, headerStyle:headerStyles.scannerHeader }}/>
+        <Stack.Screen name="WatchCard" options={{headerShown:true, title:""}}/>
       </Stack>
 
       <ToastManager topOffset={10} minHeight={40} theme={colorScheme} style={{borderRadius:generalScales.lg}}

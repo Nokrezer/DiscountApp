@@ -2,27 +2,20 @@ import { router } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
-
 import AntDesign from '@expo/vector-icons/AntDesign';
+
+import { Card } from "@/components/ui/Сard";
 
 import { useGlobalStyles } from "@/styles/useGlobalStyles";
 
-import { useGetCards } from "@/hooks/useGetCards";
 import { ThemedView } from "@/components/themed-view";
+import { useGetCards } from "@/hooks/useGetCards";
 
-import { Toast } from 'toastify-react-native';
 
 export default function CardsPage(){
   const globalStyles = useGlobalStyles();
   const [cards, setCards] = useGetCards();
-  // useEffect(() => {(async () => {
-  //   await cardDatabase.connect();
-  //   await cardDatabase.addCard("test", "r", "r", "red");
-  //   // await cardDatabase.deleteAll();
-  //   alert(JSON.stringify(await cardDatabase.getAllCards()));
-  // })();}, []);
-
+  
   return (
     <ThemedView style={[globalStyles.screen]}>
       <SafeAreaView style={{flex:1}}>
@@ -31,17 +24,16 @@ export default function CardsPage(){
             {
               cards?.map(card => {
                 return (
-                  <View key={card.id} style={styles.card}>
-                    <TouchableOpacity onPress={() => Toast.success("asd")}>
-                      <ThemedText>{card.name}</ThemedText>
-                    </TouchableOpacity>
-                  </View>)
+                    <TouchableOpacity key={card.id} style={[styles.card]}
+                      onPress={() => router.navigate({pathname:`/WatchCard`, params:{id:card.id}})}>
+                      <Card name={card.name} color={card.color} style={{flex:1}} textStyle={{fontSize:15}}/>
+                    </TouchableOpacity>)
               })
             }
           </View>
         </ScrollView>
 
-        <TouchableOpacity onPress={() => router.navigate("/card")} style={styles.addCardButton}>
+        <TouchableOpacity onPress={() => router.push("/NewCard")} style={styles.addCardButton}>
           <AntDesign name="plus-circle" size={35} color="white" />
         </TouchableOpacity>
 
@@ -53,13 +45,13 @@ export default function CardsPage(){
 const styles = StyleSheet.create({
   cardsContainer:{
     flexDirection: "row",
-    gap: 10,
+    columnGap:1,
     flexWrap: "wrap",
     justifyContent:"center"
   },
   card:{
+    aspectRatio: 1.5,
     width: "48%",
-    backgroundColor:"red"
   },
   addCardButton:{
     position:"absolute",

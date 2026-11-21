@@ -24,13 +24,13 @@ class CardDatabase{
 
     async getAllCards():Promise<Array<Record<string, any>>>{
         const db = await this.connect();
-        return db.getAllAsync(`SELECT * FROM cards`);
+        return await db.getAllAsync(`SELECT name, id, color FROM cards`);
     }
 
     async getCard(id : number){
         const db = await this.connect();
-        const card = db.getFirstAsync(`SELECT * FROM cards WHERE id = ?`, [id]);
-        return card;
+        const card = await db.getFirstAsync<Record<'name' | 'code_type', any>>(`SELECT * FROM cards WHERE id = ?`, [id]);
+        return card as Record<'name' | 'code_type', any>;
     }
 
     async addCard(name : string|null, code_data:string, code_type:string, color?:string|null){

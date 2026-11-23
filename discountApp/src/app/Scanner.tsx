@@ -1,5 +1,5 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {router} from "expo-router";
@@ -9,36 +9,44 @@ import { Toast } from 'toastify-react-native';
 import { useGetTextColor, useGlobalStyles } from "@/styles/useGlobalStyles";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { errorMessages } from '@/constants/errors';
 
 const backPage = (codeData:any) => router.dismissTo({pathname:"/NewCard", 
                                         params:{codeData:JSON.stringify(codeData)}});
 
 export default function Scanner(){
-    const globalStyles = useGlobalStyles();
     const [flashState, setFlashState] = useState<boolean>(false);
     const [permission, requestPermission] = useCameraPermissions();
     
     const textColor = useGetTextColor();
 
-    if (!permission)//ждем загрузку разрешения
+    useEffect(() => {
+        if(permission){
+            if (!permission.granted && permission.canAskAgain)
+                requestPermission();
+            if(!permission.granted && !permission.canAskAgain){//Если пользователь запретил использовать камеру
+                Toast.error(errorMessages.cameraPermissionGranted);
+                router.back();
+            }
+        }
+    }, [permission]);
+    
+    if (!permission || !permission.granted)//ждем загрузку разрешения
         return <View/>;
-
-    if(permission.granted)
-        Toast.error("Пользователь не дал доступ к камере");
 
     return (
         <SafeAreaView style={styles.screen}>
-            <CameraView style={styles.screen} facing={"back"} enableTorch={flashState} onBarcodeScanned={(data) => backPage(data)}>
-            
+            <View style={{flex:1}}>
+                <CameraView style={styles.screen} facing={"back"} enableTorch={flashState} onBarcodeScanned={(data) => backPage(data)}/>
                 <View style={styles.buttonBar}> 
-                    <TouchableOpacity style={[styles.flashButton, styles.buttons]} onPress={() => setFlashState(!flashState)}>
+                    <TouchableOpacity style={[styles.flashButton]} onPress={() => setFlashState(!flashState)}>
                         {flashState ?
                             <Ionicons name="flash" size={45} color={textColor}/> :
                             <Ionicons name="flash-off" size={45} color={textColor}/>
                         }
                     </TouchableOpacity>
                 </View>
-            </CameraView>
+            </View>
         </SafeAreaView>
     );
 }
@@ -55,9 +63,6 @@ const styles = StyleSheet.create({
         paddingBottom:20,
         backgroundColor:"transparent",
         position:"absolute"
-    },
-    buttons:{
-        // marginHorizontal:"auto"
     },
     flashButton:{
         marginLeft:"auto"

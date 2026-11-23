@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
 import { cardDatabase } from "@/database/database";
+import { useEffect, useState } from "react";
 
-type cardsKeys = "id" | "name" | "color";
+import { minCardData } from "@/constants/types";
 
 export function useGetCards(){
-    const [cards, setCards] = useState<Array<Record<cardsKeys, any>>>();
+    const [cards, setCards] = useState<Array<minCardData>>();
 
     useEffect(() => {(async () => {
         const allCards = await cardDatabase.getAllCards();
         setCards(allCards);
     })()}, []);
 
-    return [cards, setCards] as const;
+    return {cards, setCards} as const;
 }

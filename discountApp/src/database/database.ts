@@ -1,4 +1,5 @@
 import { databaseName } from "@/configs/database-config";
+import { fullCardData, minCardData } from "@/constants/types";
 import * as SQLite from 'expo-sqlite';
 
 class CardDatabase{
@@ -22,21 +23,23 @@ class CardDatabase{
         return await this.connectPromise;
     }
 
-    async getAllCards():Promise<Array<Record<string, any>>>{
+    async getAllCards():Promise<Array<minCardData>>{
         const db = await this.connect();
         return await db.getAllAsync(`SELECT name, id, color FROM cards`);
     }
 
     async getCard(id : number){
         const db = await this.connect();
-        const card = await db.getFirstAsync<Record<'name' | 'code_type', any>>(`SELECT * FROM cards WHERE id = ?`, [id]);
-        return card as Record<'name' | 'code_type', any>;
+        const card = await db.getFirstAsync<fullCardData>(`SELECT * FROM cards WHERE id = ?`, [id]);
+        return card as fullCardData;
     }
 
     async addCard(name : string|null, code_data:string, code_type:string, color?:string|null){
         const db = await this.connect();
-        await db.runAsync(`INSERT INTO cards (name, code_data, code_type, color) VALUES (?, ?, ?, ?)`,
+        const result = await db.runAsync(`INSERT INTO cards (name, code_data, code_type, color) VALUES (?, ?, ?, ?)`,
                                 [name ?? null, code_data, code_type, color ?? null]);
+
+        return result;
     }
 
     async deleteAll(){// FOR DEV
@@ -47,6 +50,13 @@ class CardDatabase{
     async deleteCard(id: number){
         const db = await this.connect();
         await db.execAsync(`DELETE FROM cards WHERE id = ${id}`);
+    }
+
+    async editCard(id:number, name:string, color:string, logo_domen?:string){
+        const db = await this.connect();
+        await db.runAsync(`UPDATE cards
+                           SET name = ?, color = ?
+                           WHERE id = ?`, [name, color, id]);
     }
 }
 

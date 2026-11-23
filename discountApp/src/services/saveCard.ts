@@ -10,7 +10,7 @@ export async function saveCard({name, codeData, codeType, color}:{name?:string, 
         }
 
         if(name && codeData && codeType)
-            await cardDatabase.addCard(name, codeData, codeType.toUpperCase());
+            return await cardDatabase.addCard(name, codeData, codeType.toUpperCase(), color);
     }catch(error){
         return error;
     }

@@ -10,7 +10,6 @@ export function useGlobalStyles(){
 
     return StyleSheet.create({
         screen:{
-            paddingHorizontal:10,
             flex:1,
             width:"100%",
             height:"100%",
@@ -22,6 +21,7 @@ export function useGlobalStyles(){
             paddingBottom:2
         },
         safeArea:{
+            paddingHorizontal:20,
             flex:1
         },
         toastSuccess:{
@@ -42,6 +42,8 @@ export const generalScales = {
     sm: 4,
     md: 8,
     lg: 16,
+    bg: 24,
+    xl: 32,
     full: "100%"
 }
 

@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,47 +10,17 @@ import { useGlobalStyles } from "@/styles/useGlobalStyles";
 
 import { ThemedView } from "@/components/themed-view";
 import { useGetCards } from "@/hooks/useGetCards";
-import { useEffect } from "react";
-
-import { cardDatabase } from "@/database/database";
-import Loading from "@/components/ui/Loading";
+import { useCallback } from "react";
 
 export default function CardsPage(){
-  const {newCardId, deleteCardId, editCardId} = useLocalSearchParams<{newCardId?:string, deleteCardId?:string, editCardId?:string}>();
+  // const {newCardId, deleteCardId, editCardId} = useLocalSearchParams<{newCardId?:string, deleteCardId?:string, editCardId?:string}>();
   
   const globalStyles = useGlobalStyles();
-  const { cards, setCards } = useGetCards();
+  const { cards, reloadCards } = useGetCards();
 
-  useEffect(() => {
-    if(!deleteCardId)
-      return;
-    
-    setCards(prev => prev?.filter((item) => item.id !== Number(deleteCardId)));
-    router.setParams({ newCardId: undefined });
-  }, [deleteCardId]);
-  
-  useEffect(() => {(async() => {
-    if(!editCardId)
-      return;
-    
-    const cardData = await cardDatabase.getCard(Number(editCardId));
-    
-    setCards(prev => [...(prev?.filter((item) => item.id !== Number(editCardId)) ?? []),
-                      cardData]);//Удаляем измененную карту и добавляем заново
-
-    router.setParams({ editCardId: undefined });
-  })()}, [editCardId]);
-  
-  useEffect(() => {(async () =>{
-    if(!newCardId) return;
-
-    //Получаем данные карты
-    const data = await cardDatabase.getCard(Number(newCardId));
-    //Добавляем к существующим картам
-    setCards(prev => [...(prev || []), data as any]);
-    //Удаляем переданные параметры
-    router.setParams({ newCardId: undefined });
-  })()}, [newCardId]);
+  useFocusEffect(useCallback(() => {
+    reloadCards();
+  }, [reloadCards]));
   
   return (
     <ThemedView style={[globalStyles.screen]}>
@@ -62,7 +32,8 @@ export default function CardsPage(){
                 return (
                     <TouchableOpacity key={card.id} style={[styles.card]}
                       onPress={() => router.navigate({pathname:`/WatchCard`, params:{id:card.id}})}>
-                      <Card name={card.name} color={card.color} style={{flex:1}} textStyle={{fontSize:15}}/>
+                      <Card name={card.name} color={card.color} logoDomain={card.logo_domen}
+                            style={{flex:1}} textStyle={{fontSize:15}} fastImage={true}/>
                     </TouchableOpacity>)
               })
             }

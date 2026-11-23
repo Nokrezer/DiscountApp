@@ -21,6 +21,7 @@ export default function EditCard(){
     const id = Number(id_);
     const [name, setName] = useState<string>("");//Имя карты
     const [color, setColor] = useState<string>("purple");
+    const [logoDomain, setLogoDomain] = useState<string>("");
 
     const globalStyles = useGlobalStyles();
 
@@ -31,13 +32,15 @@ export default function EditCard(){
         const cardData = await cardDatabase.getCard(id);
         setName(cardData.name);
         setColor(cardData.color);
+        setLogoDomain(cardData.logo_domen);
     })()}, []);
 
-    const onEditCardCallback = async () => {//При нажатии на кнопку "добавить"
-        await cardDatabase.editCard(id, name, color)
+    const onEditCardCallback = async () => {//При нажатии на кнопку "изменить"
+        await cardDatabase.editCard(id, name, color, logoDomain);
         
         Toast.success(successMessages.cardChanged);
-        router.dismissTo({pathname:"/", params:{editCardId:JSON.stringify(id)}})
+        router.navigate({pathname:'/'});
+        // router.dismissTo({pathname:"/", params:{editCardId:JSON.stringify(id)}})
     };
 
     const addButtonDisabled:boolean = name.length === 0;
@@ -46,8 +49,8 @@ export default function EditCard(){
     <ThemedView style={globalStyles.screen}>
         <SafeAreaView style={globalStyles.safeArea}>
 
-            <Card name={name} color={color}/>
-            <CardData showCodeInput={false} setName={setName} color={color} setColor={setColor} name={name}/>
+            <Card name={name} color={color} logoDomain={logoDomain}/>
+            <CardData logoDomain={logoDomain} setLogoDomain={setLogoDomain}  showCodeInput={false} setName={setName} color={color} setColor={setColor} name={name}/>
             
             <TouchableOpacity style={[styles.addButtonCard, addButtonDisabled ? styles.disabledEditButtonCard : null]} 
                 onPress={onEditCardCallback} disabled={addButtonDisabled}>

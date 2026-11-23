@@ -16,10 +16,11 @@ export default function Root(){
         <Stack.Screen name="NewCard" options={{headerShown:true, title:"Новая карта"}}/>
         <Stack.Screen name="Scanner" options={{headerShown:true, title:"", headerTransparent:true, headerShadowVisible: false, headerStyle:headerStyles.scannerHeader }}/>
         <Stack.Screen name="WatchCard" options={{headerShown:true, title:""}}/>
+        <Stack.Screen name="EditCard" options={{headerShown:true, title:""}}/>
       </Stack>
 
       <ToastManager topOffset={10} minHeight={40} theme={colorScheme} style={{borderRadius:generalScales.lg}}
-                    showProgressBar={false} showCloseIcon={false} duration={2000}/>
+                    showProgressBar={false} showCloseIcon={false} duration={1000}/>
     </ThemeProvider>);
 }
 

@@ -1,25 +1,17 @@
-import {useEffect, useState} from "react";
 import * as Brightness from 'expo-brightness';
-import { useNavigation } from "expo-router";
+import { useNavigation, useFocusEffect } from "expo-router";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { AppState } from "react-native";
 
 export function useAutoBright(){
-    const navigation = useNavigation();
-    const [bright, setBright] = useState<number>();
+    const userBrightness = useRef<number | undefined>(undefined);
 
-    //вызывается при выходе из экрана
-    navigation.addListener('blur', async () => {
-        if(bright !== undefined)
-            Brightness.setSystemBrightnessAsync(bright);
-    });
-
-    useEffect(() => {(async () => {
-        const brightness = await Brightness.getSystemBrightnessAsync();
-        if(brightness !== undefined)
-            setBright(brightness);
-
-        const { status } = await Brightness.requestPermissionsAsync();//получаем разрешение
-        if (status === 'granted')
-            Brightness.setSystemBrightnessAsync(1);//Изменяем яркость на 100%
-
-    })()}, []);
+    useFocusEffect(useCallback(() => {
+        (async () => {
+            userBrightness.current = await Brightness.getBrightnessAsync();
+            await Brightness.setBrightnessAsync(1);//Изменяем яркость на 100%
+        })();
+    return () => {
+        if(userBrightness.current) Brightness.setBrightnessAsync(userBrightness.current);
+    }}, []));
 }

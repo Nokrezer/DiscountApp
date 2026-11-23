@@ -1,44 +1,64 @@
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useState, useEffect } from "react";
+import { CameraView, Camera, BarcodeScanningResult } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
+
+import { useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {router} from "expo-router";
 
-import { Toast } from 'toastify-react-native';
-
-import { useGetTextColor, useGlobalStyles } from "@/styles/useGlobalStyles";
+import { useGetTextColor } from "@/styles/useGlobalStyles";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
+import { useGetCameraPermission } from '@/hooks/useGetCameraPermission';
+import { Toast } from 'toastify-react-native';
 import { errorMessages } from '@/constants/errors';
 
-const backPage = (codeData:any) => router.dismissTo({pathname:"/NewCard", 
+const backPage = (codeData:BarcodeScanningResult) => router.dismissTo({pathname:"/NewCard", 
                                         params:{codeData:JSON.stringify(codeData)}});
 
 export default function Scanner(){
     const [flashState, setFlashState] = useState<boolean>(false);
-    const [permission, requestPermission] = useCameraPermissions();
     
     const textColor = useGetTextColor();
+    const cameraPermissionLoading = useGetCameraPermission();
 
-    useEffect(() => {
-        if(permission){
-            if (!permission.granted && permission.canAskAgain)
-                requestPermission();
-            if(!permission.granted && !permission.canAskAgain){//Если пользователь запретил использовать камеру
-                Toast.error(errorMessages.cameraPermissionGranted);
-                router.back();
-            }
-        }
-    }, [permission]);
-    
-    if (!permission || !permission.granted)//ждем загрузку разрешения
+    if(cameraPermissionLoading)
         return <View/>;
+    
+    const onChoosePictureCallback = async () => {
+        const pickerResult = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            });
+
+        if (pickerResult.canceled)
+            return;
+        
+        try{
+            const imageUri = pickerResult.assets[0].uri;
+            const result = await Camera.scanFromURLAsync(imageUri, ['ean13', 'ean8', 'qr', 'code128', 'code39', 'upc_a', 'upc_e']);
+            
+            if(result.length === 0){
+                Toast.error(errorMessages.barcodeNotFound);
+                return;
+            }
+
+            backPage(result[0]);
+        }catch(error){
+            Toast.error(errorMessages.errorWhenScaning);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.screen}>
             <View style={{flex:1}}>
                 <CameraView style={styles.screen} facing={"back"} enableTorch={flashState} onBarcodeScanned={(data) => backPage(data)}/>
                 <View style={styles.buttonBar}> 
+                    <TouchableOpacity onPress={onChoosePictureCallback}>
+                        <AntDesign name="picture" size={45} color={textColor} />
+                    </TouchableOpacity>
+
                     <TouchableOpacity style={[styles.flashButton]} onPress={() => setFlashState(!flashState)}>
                         {flashState ?
                             <Ionicons name="flash" size={45} color={textColor}/> :

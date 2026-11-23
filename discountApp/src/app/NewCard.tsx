@@ -19,25 +19,29 @@ import { CardData } from '@/components/ui/CardDataPage';
 export default function NewCard(){
     const {codeData:data} = useLocalSearchParams();
 
-    const [name, setName] = useState<string>();//Имя карты
+    const [name, setName] = useState<string>("");//Имя карты
     const [codeType, setCodeType] = useState<string | null>(null);//тип штрих кода(если сканируется через камеру)
     const [codeData, setCodeData] = useState<string>("");//код штриха/qr
     const [color, setColor] = useState<string>("purple");
+    const [logoDomain, setLogoDomain] = useState<string>("");
 
     const globalStyles = useGlobalStyles();
 
     useEffect(() => {//useEffect срабатывает когда пользователь сканирует карту через камеру
-        if(!data) return;
+        if (typeof data !== "string") return;
 
-        //Если данные в строке, преобразуем в словарь
-        const codeDataDict = typeof data === "string" ? JSON.parse(data) : codeData;
-        setCodeData(codeDataDict.raw);
-        setCodeType(codeDataDict.type);
+        try {
+            const parsed = JSON.parse(data);
+            if (typeof parsed?.raw === "string") setCodeData(parsed.raw);
+            if (typeof parsed?.type === "string") setCodeType(parsed.type);
+        } catch {
+            Toast.error(errorMessages.errorWhenScaning);
+        }
     }, [data]);
 
     const onAddNewCardCallback = async () => {//При нажатии на кнопку "добавить"
         //сохраняем и получаем id добавленной карты(lastInsertRowId). Может вернуть ошибку
-        const response = await saveCard({name, codeData, codeType, color}) as Record<"lastInsertRowId", number> | Error;
+        const response = await saveCard({name, codeData, rawType:codeType, color, logoDomain}) as Record<"lastInsertRowId", number> | Error;
         if(response instanceof Error){
             Toast.error(errorMessages.errorAddingCard);
             router.back();
@@ -45,17 +49,17 @@ export default function NewCard(){
         }
         
         Toast.success(successMessages.cardAdded);
-        router.dismissTo({pathname:"/", params:{newCardId:JSON.stringify(response.lastInsertRowId)}})
+        router.navigate({pathname:"/"});
     };
 
-    const addButtonDisabled:boolean = (!name || (codeData ?? "").length < 13);
+    const addButtonDisabled:boolean = (!name || (codeData ?? "").length < 3 || (name.replaceAll(" ", "") === ""));
     
     return(
     <ThemedView style={globalStyles.screen}>
         <SafeAreaView style={globalStyles.safeArea}>
 
-            <Card name={name} color={color}/>
-            <CardData setCodeData={setCodeData} codeData={codeData} setName={setName} color={color} setColor={setColor}/>
+            <Card name={name} color={color} logoDomain={logoDomain}/>
+            <CardData logoDomain={logoDomain} setLogoDomain={setLogoDomain} setCodeData={setCodeData} codeData={codeData} setName={setName} color={color} setColor={setColor}/>
             
             <TouchableOpacity style={[styles.addButtonCard, addButtonDisabled ? styles.disabledAddButtonCard : null]} 
                 onPress={onAddNewCardCallback} disabled={addButtonDisabled}>

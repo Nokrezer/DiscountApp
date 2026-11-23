@@ -1,17 +1,19 @@
 import { cardDatabase } from "@/database/database";
 
-export async function saveCard({name, codeData, codeType, color}:{name?:string, codeData?:string, codeType?:string | null, color: string}){
-    try{
-        if(codeType === null){//Если тип кода не задан(если пользователь вводил данные вручную)
-            if(codeData?.length === 13)
-                codeType = "EAN13";
-            else
-                codeType = "CODE128";
-        }
+export async function saveCard({name, codeData, rawType, color, logoDomain}:
+    {name?:string, codeData?:string, rawType:string | null | number, color: string, logoDomain:string}){
+    
+    let codeType:string = String(rawType ?? "");
+        
+    if(codeType === "256" || codeType === "qr")
+        codeType = "QR";
+    else if(codeData && codeData.length === 13)
+        codeType = "EAN13";
+    else
+        codeType = "CODE128";
+    
+    if(!name || !codeData)
+        return null;
 
-        if(name && codeData && codeType)
-            return await cardDatabase.addCard(name, codeData, codeType.toUpperCase(), color);
-    }catch(error){
-        return error;
-    }
+    return await cardDatabase.addCard(name, codeData, codeType.toUpperCase(), color, logoDomain);
 }

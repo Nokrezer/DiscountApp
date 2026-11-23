@@ -1,6 +1,6 @@
 import { ThemedView } from "@/components/themed-view";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { generalScales, useGetTextColor, useGlobalStyles } from "@/styles/useGlobalStyles";
@@ -23,6 +23,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { useAutoBright } from "@/hooks/useAutoBright";
 
 import { EditCardMenu } from "@/components/ui/EditCardMenu";
+import { fullCardData } from "@/constants/types";
 
 export default function WatchCard(){
     const {id} = useLocalSearchParams() as { id?: number };
@@ -31,25 +32,24 @@ export default function WatchCard(){
     const navigation = useNavigation();
     const [menuVisible, setMenuVisible] = useState<boolean>(false);
     
+    //Когда пользователь на странице выставляет яркость 100%, и возвращает обратно когда пользователь уходит
+    useAutoBright();
+
+    const {cardData, loading} : {cardData?:fullCardData; loading:boolean} = useGetCard({id: id ?? null});
+
     useEffect(() => {
         navigation.setOptions({
+        title:cardData?.name ?? "",
         headerRight: () => (
             <TouchableOpacity onPress={() => {setMenuVisible(true)}}>
                 <AntDesign name="menu" size={24} color={textColor} />
             </TouchableOpacity>
         ),
-    })}, [navigation, textColor]);
-
-    //Когда пользователь на странице выставляет яркость 100%, и возвращает обратно когда пользователь уходит
-    useAutoBright();
-    
-    if(!id) return;
-
-    const {cardData, loading} : {cardData?:Record<any, any>; loading:boolean} = useGetCard({id: id });
+    })}, [navigation, textColor, cardData?.name]);
     
     if(loading) return <View/>;
 
-    if(!cardData){
+    if(!cardData || !id){
         Toast.error(errorMessages.errorLoadCard);
         return;
     }
@@ -57,15 +57,14 @@ export default function WatchCard(){
     return (
         <ThemedView style={[globalStyles.screen]}>
             <SafeAreaView style={[globalStyles.safeArea]}>
-                <Card name={cardData.name} color={cardData.color}/>
+                <Card name={cardData.name} color={cardData.color} logoDomain={cardData.logo_domen} fastImage={true}/>
                     <View style={styles.barcode}>
                         {cardData.code_type === "QR" ?  
                         <QRCode value={cardData.code_data} bgColor="white"/> :
                         <View>
                             <Barcode value={cardData.code_data}
                                     options={{ format: cardData.code_type, background: 'white',
-                                    width: (cardData.code_data.length < 13 ? 4 : 2), height:120, fontSize:14, marginLeft:-20, displayValue:false }}/>
-                        <Text style={styles.codeDataText}>{cardData.code_data}</Text>
+                                    width: (cardData.code_data.length < 13 ? 3 : 2), height:100, fontSize:14, marginLeft:-20, displayValue:true }}/>
                         </View>
                         }
                     </View>

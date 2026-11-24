@@ -5,7 +5,7 @@ Discounter is a mobile app for storing your loyalty and discount cards in one pl
 ## Screenshots
 
 <p>
-  <img src="docs/screens/card-list.jpg" alt="List of saved discount cards" width="240">
+  <img src="docs/screens/cards-list.jpg" alt="List of saved discount cards" width="240">
   <img src="docs/screens/new-card.jpg" alt="Add a discount card screen" width="240">
   <img src="docs/screens/card.jpg" alt="Add a discount card screen" width="240">
 </p>

@@ -68,8 +68,8 @@ export default function WatchCard(){
                         </View>
                         }
                     </View>
-            </SafeAreaView>
             {menuVisible ? <EditCardMenu id={id} name={cardData.name} onClose={() => setMenuVisible(false)}/> : null}
+            </SafeAreaView>
         </ThemedView>
     );
 }

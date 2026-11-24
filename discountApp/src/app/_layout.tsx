@@ -19,7 +19,7 @@ export default function Root(){
         <Stack.Screen name="EditCard" options={{headerShown:true, title:""}}/>
       </Stack>
 
-      <ToastManager topOffset={10} minHeight={40} theme={colorScheme} style={{borderRadius:generalScales.lg}}
+      <ToastManager minHeight={40} theme={colorScheme} style={{borderRadius:generalScales.lg}}
                     showProgressBar={false} showCloseIcon={false} duration={1000}/>
     </ThemeProvider>);
 }

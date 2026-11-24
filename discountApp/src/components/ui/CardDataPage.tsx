@@ -1,5 +1,4 @@
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import { useEffect } from "react";
 import ColorPicker, { HueSlider } from "reanimated-color-picker";
 
 import { router } from "expo-router";

@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { Alert, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "../themed-text";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { generalScales, useGetTextColor } from "@/styles/useGlobalStyles";
 
@@ -30,6 +31,7 @@ const deleteAlert = (cardName:string, cardId:number) => Alert.alert(`Вы уве
 
 export function EditCardMenu({id, name, onClose}:{id:number, name:string, onClose:() => void}){
     const textColor = useGetTextColor();
+    const safeInsets = useSafeAreaInsets();
 
     const onEditCallback = () => {
         router.push({pathname:"/EditCard", params:{id:id}});
@@ -47,7 +49,7 @@ export function EditCardMenu({id, name, onClose}:{id:number, name:string, onClos
         visible={true}
         animationType="fade">
         <TouchableOpacity style={styles.closeBg} onPress={onClose}/>
-        <View style={styles.menu}>
+        <View style={[styles.menu, {marginBottom:safeInsets.bottom}]}>
 
             <TouchableOpacity style={styles.button} onPress={onRemoveCallback}>
                 <EvilIcons name="trash" size={30} color="red" />
@@ -66,11 +68,13 @@ const styles = StyleSheet.create({
     menu:{
         position:"absolute",
         bottom:0,
-        borderRadius:generalScales.bg,
+        borderTopLeftRadius:generalScales.bg,
+        borderTopRightRadius:generalScales.bg,
         backgroundColor:'#151a30',
         width:"100%",
         paddingHorizontal:20,
-        paddingVertical:10
+        paddingVertical:10,
+        gap:5
     },
     button:{
         flexDirection:"row",

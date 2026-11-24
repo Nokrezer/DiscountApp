@@ -1,24 +1,30 @@
 {
   "expo": {
-    "name": "discountApp",
-    "slug": "discountApp",
+    "name": "Discounter",
+    "slug": "discounter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "discountapp",
+    "scheme": "discounter",
     "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#5040e0",
+      "imageWidth": 642
+    },
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.anonymous.discounter"
     },
     "android": {
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#5040e0"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.discounter"
     },
     "web": {
       "output": "server",
@@ -35,7 +41,20 @@
         }
       ],
       "expo-sqlite",
-      "expo-image"
+      "expo-image",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "useLegacyPackaging": true,
+            "buildArchs": ["arm64-v8a", "armeabi-v7a"],
+            "gifEnabled": false,
+            "webpEnabled": false
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
